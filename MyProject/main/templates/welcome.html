@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+       {% load static %}
+    <meta charset="utf-8">
+    <title>Base</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+  </head>
+  <style>
+      .card:hover {
+        transform: scale(1.02);
+        transition: 0.3s ease-in-out;
+    }
+    
+        .btn-primary, .btn-outline-primary {
+        border-radius: 20px;
+    }
+    
+        footer {
+        background-color: #f8f9fa;
+        color: #6c757d;
+    }
+    .navbar {
+            background-color: #2c3e50;
+            border: none;
+            font-family: Arial, sans-serif;
+        }
+        .navbar-brand {
+            font-size: 24px;
+            color: #ecf0f1 !important;
+        }
+        .navbar-nav > li > a {
+            color: #ecf0f1 !important;
+            font-size: 16px;
+            padding: 15px 20px;
+        }
+        .navbar-nav > li > a:hover {
+            background-color: #34495e !important;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        .image-gallery img {
+            max-width: 300px;
+            height: auto;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+  </style>
+  <body>
+     <nav class="navbar navbar-default navbar-static-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Platformunk</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Bejelentkezés</a></li>
+                <li><a href="{% url 'register' %}"><span class="glyphicon glyphicon-user"></span> Regisztráció</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    
+    <div class="container mt-5">
+    <!-- Üdvözlő rész -->
+    <section class="text-center mb-5">
+        <h1 style="font-weight: bold;">Üdvözlünk a Platformunkon!</h1>
+        <p class="lead">Fedezd fel funkcióinkat, és találd meg a számodra megfelelő cikket, videót ami téged legjobban érdekelhet.</p>
+        <a href="*" class="btn btn-primary">Bővitmény letöltése</a>
+    </section>
+
+    <!-- Funkciók szekció -->
+    <section id="features" class="mb-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body" >
+                        
+                        <h3 class="card-title" style="font-weight: bold;">Felhasználói keresési előzményeken alapuló tartalomajánló rendszer</h3>
+                        <div class="image-gallery">
+                            <img src="{% static 'images/kep1.jpg' %}" alt="Kép 1">
+                        </div>
+                        <p class="card-text">Ez a projekt egy Google Chrome-bővítményt fejleszt, amely egy Django-alapú háttérrendszerhez csatlakozik, és elemzi a felhasználók keresési előzményeit. A cél, hogy személyre szabott tartalomajánlásokat nyújtson az érdeklődési körök alapján, AI-modell segítségével. A bővítmény lehetőséget biztosít a felhasználóknak a nyomon követési beállítások kezelésére, különös figyelmet fordítva az adatok biztonságára és az adatvédelmi előírásokra.</p>
+                        <a href="{% url 'learn_more' %}" class="btn btn-outline-primary">Tudj meg többet</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title" style="font-weight: bold;">Egyszeri Letöltés és Gyors Eredmények </h3>
+                        <div class="image-gallery">
+                            <img src="{% static 'images/kep2.jpg' %}" alt="Kép 1">
+                        </div>
+                        <p class="card-text">Ez a funkció lehetővé tenné a felhasználók számára, hogy egyetlen kattintással letöltsék az alkalmazást vagy böngészőbővítményt, majd azonnal elkezdhessék az eszköz használatát, és gyors ajánlásokat kapjanak a keresési előzmények alapján.</p>
+                        <a href="{% url 'learn_more' %}" class="btn btn-outline-primary">Tudj meg többet</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title" style="font-weight: bold;"> Biztonságos Adattárolás</h3>
+                           <div class="image-gallery">
+                            <img src="{% static 'images/kep3.jpg' %}" alt="Kép 1">
+                        </div>
+                        <p class="card-text">Minden adat titkosítva tárolódik a háttérrendszerben, és csak a legszükségesebb információkat tároljuk a felhasználói élmény javításához. Az alkalmazás támogatja a felhasználók adatainak teljes átláthatóságát, beleértve a saját adataikhoz való hozzáférést és azok törlését is.</p>
+                        <a href="{% url 'learn_more' %}" class="btn btn-outline-primary">Tudj meg többet</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Lábléc -->
+<footer class="text-center mt-5 py-3 bg-light">
+    <p>&copy; 2024 Rába Róbert. Minden jog fenntartva.</p>
+    <a href="#navbar">Vissza a tetejére</a>
+</footer>
+
+    <div class="container">
+    {% block body_block %}
+    {% endblock %}
+    </div>
+
+
+  </body>
+</html>

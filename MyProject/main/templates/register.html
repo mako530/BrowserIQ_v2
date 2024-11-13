@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Regisztráció</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+        .navbar {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 10px;
+        }
+        .navbar-brand {
+            font-size: 24px;
+        }
+        .container {
+            max-width: 500px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'welcome' %}">Platformunk</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Regisztráció</h2>
+        <form method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Regisztráció</button>
+        </form>
+    </div>
+</body>
+</html>
