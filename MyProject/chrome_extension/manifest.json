@@ -2,11 +2,10 @@
   "manifest_version": 3,
   "name": "Search History Saver",
   "version": "1.0",
-  "description": "Figyeli a felhasználó böngészési előzményeit és menti azokat a szerverre.",
+  "description": "Mentse a böngészési előzményeket és küldje el a szerverre.",
   "permissions": [
     "history",
     "storage",
-    "downloads",
     "webNavigation"
   ],
   "background": {
@@ -16,7 +15,6 @@
     "http://127.0.0.1:8000/*"
   ],
   "action": {
-    "default_popup": "popup.html",
     "default_icon": "icon.png"
   },
   "icons": {

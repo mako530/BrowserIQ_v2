@@ -2,10 +2,113 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Personal oldal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Személyes oldal</title>
+    <style>
+        /* Alap stílusok */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ecf0f1;
+        }
+
+        .navbar {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .navbar a img {
+            margin-right: 8px;
+            width: 20px;
+            height: 20px;
+        }
+
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            padding: 5px 0;
+        }
+    </style>
 </head>
 <body>
-    <h1>Üdvözöljük a személyes oldalon!</h1>
-    <button id="uploadButton">Előzmények feltöltése a szerverre</button>
+    <!-- Navbar kezdete -->
+<nav style="background-color: #2c3e50; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+    <!-- Logó -->
+    <div style="color: white; font-size: 24px; font-weight: bold;">
+        <img src="https://via.placeholder.com/40" alt="Logo" style="vertical-align: middle;">
+        MyApp
+    </div>
+
+    <!-- Gombok -->
+    <div style="display: flex; gap: 20px;">
+        <a href="{% url 'personal' %}" style="color: white; text-decoration: none; font-size: 16px; display: flex; align-items: center;">
+            <img src="https://via.placeholder.com/20?text=P" alt="Personal Icon" style="margin-right: 8px;">
+            Personal
+        </a>
+        <a href="{% url 'logout' %}" style="color: white; text-decoration: none; font-size: 16px; display: flex; align-items: center;">
+            <img src="https://via.placeholder.com/20?text=K" alt="Logout Icon" style="margin-right: 8px;">
+            Logout
+        </a>
+    </div>
+</nav>
+    <!-- Navbar vége -->
+
+    <div class="container">
+    <h1>Üdvözöljük, {{ request.user.username }}!</h1>
+        <h2>Böngészési előzményeid</h2>
+    <ul>
+    {% for history in user_history %}
+        <li>{{ history.url }} - {{ history.timestamp }}</li>
+    {% endfor %}
+    </ul>
+
+    <h1>Ajánlások az érdeklődési köreid alapján</h1>
+    {% if recommendations.message %}
+        <p>{{ recommendations.message }}</p>
+    {% else %}
+        {% for category, links in recommendations. %}
+            <h2>{{ category }}</h2>
+            <ul>
+                {% for link in links %}
+                    <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    {% endif %}
 </body>
 </html>
+

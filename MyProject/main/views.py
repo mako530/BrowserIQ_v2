@@ -1,19 +1,22 @@
 import os
 
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.views import LoginView
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
+from dotenv import load_dotenv
 from .ai_recommender import recommend_content
-
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .models import UserHistory
 
 def welcome(request):
     return render(request, 'welcome.html')
-
 
 def download_extension(request):
     return render(request, 'download.html')
@@ -21,6 +24,9 @@ def download_extension(request):
 def learn_more(request):
     return render(request, 'learn_more.html')
 
+def custom_logout(request):
+    logout(request)  # A felhasználó kijelentkeztetése
+    return redirect('welcome')  # Átirányítás a 'welcome' oldalra
 
 class CustomLoginView(LoginView):
     template_name = 'login.html'
@@ -54,49 +60,53 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
 
-
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from .models import SearchHistory
-
-
 @csrf_exempt
 def upload_history_file(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+
             urls = data.get('urls', [])
-            user = request.user  # vagy más módon azonosíthatjuk a felhasználót
+            print(data)
+            if not urls:
+                return JsonResponse({"status": "error", "message": "No URLs provided"}, status=400)
 
+            # Bejelentkezett felhasználó lekérése
+            user = request.user
+            print(user)
+            if not user.is_authenticated:
+                return JsonResponse({"status": "error", "message": "User not authenticated"}, status=403)
+
+            # URL-ek mentése
             for url in urls:
-                SearchHistory.objects.create(user=user, url=url)
+                UserHistory.objects.create(user=user, url=url)
 
-            return JsonResponse({"status": "success", "message": "Előzmények sikeresen mentve!"})
+            return JsonResponse({"status": "success", "message": "History saved successfully!"})
+
         except Exception as e:
-            print("Hiba történt:", e)
-            return JsonResponse({"status": "error", "message": "Hiba történt az előzmények mentése során."}, status=500)
-    return JsonResponse({"status": "error", "message": "Csak POST kérés fogadható!"}, status=400)
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+    return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
+
+load_dotenv()
 
 @login_required
 def personal_view(request):
-    # Felhasználói előzmények lekérése
-    user_history = [history.url for history in SearchHistory.objects.filter(user=request.user)]
+    """
+    A felhasználó keresési előzményei alapján ajánlások generálása.
+    """
+    user = request.user
 
-    # Ajánlások generálása
-    recommendations = recommend_content(user_history)
+    # Lekérjük a felhasználó URL előzményeit az adatbázisból
+    search_history = UserHistory.objects.filter(user=user).values_list("url", flat=True)
 
-    # Statisztikák (például kedvelt oldalak és érdeklődési körök)
-    stats = {
-        "favourite_sites_count": len(user_history),  # példaként összes URL
-        "interests": "Technológia, Tudomány"  # statikus adat példaként
-    }
-
-    # Feltöltött fájlok listázása
-    uploaded_files = SearchHistory.objects.filter(user=request.user)
+    if not search_history:
+        recommendations = {"message": "Nincsenek keresési előzményeid."}
+    else:
+        # Ajánlások generálása az URL-ek alapján
+        recommendations = recommend_content(list(search_history))  # Konvertáld listára, ha QuerySet
 
     return render(request, "personal.html", {
-        "recommendations": recommendations,
-        "stats": stats,
-        "uploaded_files": uploaded_files
+        "recommendations": recommendations
     })

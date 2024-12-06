@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-    {% load static %}
     <meta charset="UTF-8">
     <title>Bejelentkezés</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -12,11 +11,12 @@
             padding: 10px;
         }
         .navbar-brand {
-            font-size: 24px;
+            font-size: 32px;
         }
         .container {
             max-width: 500px;
             margin-top: 50px;
+
         }
     </style>
 </head>
@@ -26,23 +26,15 @@
             <a class="navbar-brand" href="{% url 'welcome' %}">Platformunk</a>
         </div>
     </nav>
+    <div class="container">
+        <h2>Bejelentkezés</h2>
+        <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Bejelentkezés</button>
+        </form>
+    </div>
 
-{% block content %}
-<h2>Bejelentkezés</h2>
-<form method="post" action="{% url 'login' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Bejelentkezés</button>
-</form>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    if ("{{ user.is_authenticated }}") {
-        chrome.runtime.sendMessage({ action: "sendHistory" });
-    }
-});
-</script>
-{% endblock %}
 
 </body>
 </html>

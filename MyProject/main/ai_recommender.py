@@ -1,30 +1,80 @@
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+import os
+import requests
+from dotenv import load_dotenv
 
-# Példaként használt külső tartalmak
-sample_contents = [
-    "latest technology news and updates",
-    "machine learning and AI advancements",
-    "top programming languages",
-    "how to start in data science",
-    "recent trends in artificial intelligence"
-]
+# Környezeti változók betöltése
+load_dotenv()
+
+# YouTube API kulcs betöltése
+API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 
-# Ajánló függvény
-def recommend_content(user_history, sample_contents=sample_contents):
-    vectorizer = TfidfVectorizer()
-    all_texts = user_history + sample_contents
-    vectors = vectorizer.fit_transform(all_texts)
+def fetch_youtube_recommendations(query):
+    """
+    YouTube keresési eredmények lekérése egy adott kulcsszóra.
+    """
+    base_url = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        "part": "snippet",
+        "maxResults": 5,  # Max 5 ajánlás
+        "q": query,
+        "type": "video",
+        "key": API_KEY,
+    }
 
-    # Csak a felhasználói előzményeken alapuló vektorok
-    user_vector = vectors[:len(user_history)]
-    content_vectors = vectors[len(user_history):]
+    try:
+        response = requests.get(base_url, params=params)
+        response.raise_for_status()  # Hibák kezelése
+        data = response.json()
 
-    # Hasonlóságok kiszámítása
-    similarity_matrix = cosine_similarity(user_vector, content_vectors)
-    avg_similarity = similarity_matrix.mean(axis=0)
-    recommendations = avg_similarity.argsort()[-3:][::-1]  # Top 3 ajánlás
+        # Videók linkjeinek kinyerése
+        recommendations = []
+        for item in data.get("items", []):
+            video_id = item["id"]["videoId"]
+            video_title = item["snippet"]["title"]
+            recommendations.append({
+                "title": video_title,
+                "url": f"https://www.youtube.com/watch?v={video_id}",
+            })
+        return recommendations
+    except requests.exceptions.RequestException as e:
+        print(f"YouTube API error: {e}")
+        return []
 
-    # Ajánlott tartalmak visszaadása
-    return [sample_contents[i] for i in recommendations]
+
+def recommend_content(urls):
+    """
+    Keresési előzmények alapján ajánlások generálása.
+    """
+    # Témák az URL-ek alapján
+    topics = {
+        "programming": ["python", "java", "c++", "programming"],
+        "news": ["news", "bbc", "cnn", "politics"],
+        "shopping": ["shop", "amazon", "ebay"],
+        "videos": ["youtube", "vimeo"],
+    }
+
+    user_interests = {
+        "programming": False,
+        "news": False,
+        "shopping": False,
+        "videos": False,
+    }
+
+    for url in urls:
+        for topic, keywords in topics.items():
+            if any(keyword in url.lower() for keyword in keywords):
+                user_interests[topic] = True
+
+    # Ajánlások összegyűjtése
+    recommendations = {}
+    if user_interests["programming"]:
+        recommendations["Programming Videos"] = fetch_youtube_recommendations("programming tutorials")
+    if user_interests["news"]:
+        recommendations["News Updates"] = fetch_youtube_recommendations("latest news")
+    if user_interests["shopping"]:
+        recommendations["Shopping Deals"] = fetch_youtube_recommendations("shopping deals")
+    if user_interests["videos"]:
+        recommendations["Popular Videos"] = fetch_youtube_recommendations("popular videos")
+
+    return recommendations
